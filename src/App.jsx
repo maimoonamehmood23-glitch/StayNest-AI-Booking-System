@@ -75,13 +75,21 @@ function BookingForm({ hotel, search, choice, extras, onDone, onChange }) {
     if (Object.keys(found).length) return;
     if (!isConfigured) return setSubmitError('Supabase is not configured. Add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY to .env.');
     setBusy(true);
-    const { data, error } = await supabase.rpc('create_booking', {
-      p_name: f.name.trim(), p_email: f.email.trim(), p_phone: f.phone.trim(), p_hotel: hotel.id, p_room: room.id, p_rooms: choice.rooms, p_extras: choice.extras,
-      p_check_in: f.checkIn, p_check_out: f.checkOut, p_guests: Number(f.guests), p_request: f.request.trim(),
-    });
-    setBusy(false);
-    if (error || !data?.length) return setSubmitError(`Booking failed: ${error?.message || 'no response from database'}`);
-    onDone({ id: data[0].booking_id, status: data[0].booking_status, total: data[0].total_price, room, rooms: choice.rooms, extraNames: extras.filter(e => choice.extras.includes(e.code)).map(e => e.name), name: f.name.trim(), hotel, checkIn: f.checkIn, checkOut: f.checkOut, guests: f.guests });
+    try {
+      const { data, error } = await supabase.rpc('create_booking', {
+        p_name: f.name.trim(), p_email: f.email.trim(), p_phone: f.phone.trim(), p_hotel: hotel.id, p_room: room.id, p_rooms: choice.rooms, p_extras: choice.extras,
+        p_check_in: f.checkIn, p_check_out: f.checkOut, p_guests: Number(f.guests), p_request: f.request.trim(),
+      });
+      if (error || !data?.length) {
+        setSubmitError(`Booking failed: ${error?.message || 'no response from database'}`);
+      } else {
+        onDone({ id: data[0].booking_id, status: data[0].booking_status, total: data[0].total_price, room, rooms: choice.rooms, extraNames: extras.filter(e => choice.extras.includes(e.code)).map(e => e.name), name: f.name.trim(), hotel, checkIn: f.checkIn, checkOut: f.checkOut, guests: f.guests });
+      }
+    } catch (err) {
+      setSubmitError(`An unexpected error occurred: ${err.message || 'Please try again later.'}`);
+    } finally {
+      setBusy(false);
+    }
   }
   // plain function (not a component) so inputs keep focus while typing
   const field = (k, label, p = {}) => (
