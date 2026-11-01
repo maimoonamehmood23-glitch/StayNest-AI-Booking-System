@@ -1,6 +1,6 @@
 # StayNest – Hotel Booking MVP
 
-StayNest is an original hotel booking website built for a university assignment. It allows users to search for hotels, view detailed information, and book stays with real-time data persistence.
+StayNest is a hotel booking website (React + Vite + Supabase). The base project already existed; this assignment added booking validation, testing docs, a code-review skill and an AI-assisted Jira and GitHub workflow. It allows users to search for hotels, view detailed information, and book stays with real-time data persistence.
 
 ## Features
 - **Hotel Search**: Find hotels by destination, dates, and number of guests.
